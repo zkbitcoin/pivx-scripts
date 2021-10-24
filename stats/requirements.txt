@@ -1,0 +1,4 @@
+bitcoinrpc==0.4.0
+python-bitcoinrpc==1.0
+python-rocksdb==0.7.0
+urllib3==1.26.7
