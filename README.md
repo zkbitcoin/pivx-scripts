@@ -12,3 +12,287 @@ pivx-scripts
 5. update default json and db paths in update_stats_addresses_earnings.py
 
 6. python3 update_stats_addresses_earnings.py
+
+Note:
+
+Result is json file of the sample format below
+(block_counters array structure is index = 0 thru 4 staking counts for last 50 250 500 750 1000 blocks respectively 
+
+[
+  {
+    "address": "D6ixy2j2qyYMPAibobymDkiXMEYSyKX3Mb",
+    "counters": {
+      "block_counters": [
+        22,
+        44,
+        44,
+        44,
+        44
+      ],
+      "date_counters": {
+        "ymdH": [
+          {
+            "date": "2021-10-24 08",
+            "count": 4
+          }
+        ],
+        "ymd": [
+          {
+            "date": "2021-10-24",
+            "count": 4
+          }
+        ],
+        "ym": [
+          {
+            "date": "2021-10",
+            "count": 4
+          }
+        ],
+        "y": [
+          {
+            "date": "2021",
+            "count": 4
+          }
+        ]
+      }
+    }
+  },
+  {
+    "address": "STx39nArrm6fRBuo1QGm76Aax9YURGCiYi",
+    "counters": {
+      "block_counters": [
+        12,
+        26,
+        26,
+        26,
+        26
+      ],
+      "date_counters": {
+        "ymdH": [
+          {
+            "date": "2021-10-24 08",
+            "count": 2
+          }
+        ],
+        "ymd": [
+          {
+            "date": "2021-10-24",
+            "count": 2
+          }
+        ],
+        "ym": [
+          {
+            "date": "2021-10",
+            "count": 2
+          }
+        ],
+        "y": [
+          {
+            "date": "2021",
+            "count": 2
+          }
+        ]
+      }
+    }
+  },
+  {
+    "address": "DBa5cB3hMns5kwrdWVuCx9JjR5s5sVCY7U",
+    "counters": {
+      "block_counters": [
+        14,
+        22,
+        22,
+        22,
+        22
+      ],
+      "date_counters": {
+        "ymdH": [
+          {
+            "date": "2021-10-24 08",
+            "count": 6
+          }
+        ],
+        "ymd": [
+          {
+            "date": "2021-10-24",
+            "count": 6
+          }
+        ],
+        "ym": [
+          {
+            "date": "2021-10",
+            "count": 6
+          }
+        ],
+        "y": [
+          {
+            "date": "2021",
+            "count": 6
+          }
+        ]
+      }
+    }
+  },
+  {
+    "address": "DDU6BCfxp2eGdQ5AuoyL4QQo6D4abms5qg",
+    "counters": {
+      "block_counters": [
+        4,
+        12,
+        12,
+        12,
+        12
+      ]
+    }
+  },
+  {
+    "address": "DQqkQD2s4CgG2GAjcRXiT5crpXneLGHHVT",
+    "counters": {
+      "block_counters": [
+        8,
+        8,
+        8,
+        8,
+        8
+      ]
+    }
+  },
+  {
+    "address": "D6B4Sw89gsKveLEdG9G5GC49APq6VJdMi6",
+    "counters": {
+      "block_counters": [
+        2,
+        4,
+        4,
+        4,
+        4
+      ],
+      "date_counters": {
+        "ymdH": [
+          {
+            "date": "2021-10-24 08",
+            "count": 2
+          }
+        ],
+        "ymd": [
+          {
+            "date": "2021-10-24",
+            "count": 2
+          }
+        ],
+        "ym": [
+          {
+            "date": "2021-10",
+            "count": 2
+          }
+        ],
+        "y": [
+          {
+            "date": "2021",
+            "count": 2
+          }
+        ]
+      }
+    }
+  },
+  {
+    "address": "D8xM8qYTxCngeWeMTzC5b5aRCMkAmLJUfk",
+    "counters": {
+      "block_counters": [
+        2,
+        4,
+        4,
+        4,
+        4
+      ],
+      "date_counters": {
+        "ymdH": [
+          {
+            "date": "2021-10-24 08",
+            "count": 2
+          }
+        ],
+        "ymd": [
+          {
+            "date": "2021-10-24",
+            "count": 2
+          }
+        ],
+        "ym": [
+          {
+            "date": "2021-10",
+            "count": 2
+          }
+        ],
+        "y": [
+          {
+            "date": "2021",
+            "count": 2
+          }
+        ]
+      }
+    }
+  },
+  {
+    "address": "DDjPsKCkfgPwrSkAgqcZ4YZR9NTPTz6xFB",
+    "counters": {
+      "block_counters": [
+        4,
+        4,
+        4,
+        4,
+        4
+      ]
+    }
+  },
+  {
+    "address": "D9KY88xQV7SGevxcViREuWCVYdAyh2D4h1",
+    "counters": {
+      "block_counters": [
+        2,
+        2,
+        2,
+        2,
+        2
+      ]
+    }
+  },
+  {
+    "address": "DSnE53PN6Z1p1b8vcvDkEWmByiq23Cco4M",
+    "counters": {
+      "block_counters": [
+        2,
+        2,
+        2,
+        2,
+        2
+      ],
+      "date_counters": {
+        "ymdH": [
+          {
+            "date": "2021-10-24 08",
+            "count": 2
+          }
+        ],
+        "ymd": [
+          {
+            "date": "2021-10-24",
+            "count": 2
+          }
+        ],
+        "ym": [
+          {
+            "date": "2021-10",
+            "count": 2
+          }
+        ],
+        "y": [
+          {
+            "date": "2021",
+            "count": 2
+          }
+        ]
+      }
+    }
+  }
+]
