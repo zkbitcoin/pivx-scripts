@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-# https://github-wiki-see.page/m/facebook/rocksdb/wiki/Column-Families
+__author__ = "zkbitcoin.com"
+__copyright__ = "Copyright (C) 2021 zkbitcoin.com"
+__license__ = "MIT License"
+__version__ = "1.0"
 
 from bitcoinrpc.authproxy import AuthServiceProxy
 import rocksdb
