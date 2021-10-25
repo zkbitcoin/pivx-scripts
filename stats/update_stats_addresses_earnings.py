@@ -154,8 +154,9 @@ def get_counters(process_type, block_start, block_stop, order):
                                     ymd = date.strftime("%Y-%m-%d")
                                     ym = date.strftime("%Y-%m")
                                     y = date.strftime("%Y")
-                                    if address not in date_counters or not date_counters[address]:
+                                    if address not in date_counters:
                                         date_counters[address] = {}
+                                    if 'date_counters' not in date_counters[address]:
                                         addresses[address]['date_counters'] = {}
                                         date_counters[address]['ymdH'] = OrderedDict()
                                         date_counters[address]['ymd'] = OrderedDict()
@@ -190,7 +191,7 @@ else:
         d = json.load(json_data)
         json_data.close()
         db_to_date_counters()
-        get_counters(PROCESS_DATE_COUNTERS, d["block"]+1, blockCount, +1)
+        #get_counters(PROCESS_DATE_COUNTERS, d["block"]+1, blockCount, +1)
 
 try:
     address_stake_array = []
