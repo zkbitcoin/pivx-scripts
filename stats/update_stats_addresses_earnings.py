@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-__author__ = "zkbitcoin.com"
-__copyright__ = "Copyright (C) 2021 zkbitcoin.com"
-__license__ = "MIT License"
-__version__ = "1.0"
+# https://github-wiki-see.page/m/facebook/rocksdb/wiki/Column-Families
 
 from bitcoinrpc.authproxy import AuthServiceProxy
 import rocksdb
@@ -34,21 +31,21 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-r', '--runfile-location-path',
                     required=False,
                     type=str,
-                    default="./data/run",
+                    default="../../../../run",
                     dest="rloc",
                     metavar="<runfile-location-path>",
                     help="runfile-location-path" )
 parser.add_argument('-o', '--output-location-path',
                     required=False,
                     type=str,
-                    default="./data/json",
+                    default="../../../../stats_data/address-stake/json",
                     dest="oloc",
                     metavar="<output-location-path>",
                     help="output-location-path")
 parser.add_argument('-d', '--db-location-path',
                     required=False,
                     type=str,
-                    default="./data/db",
+                    default="../../../../stats_data/address-stake/db",
                     dest="dbloc",
                     metavar="<output-location-path>",
                     help="output-location-path")
@@ -90,10 +87,20 @@ def db_to_date_counters():
     for i in it:
         k = str(i[0], "utf-8")
         v = i[1]
-        date_counters[k] = {}
-        date_counters.update(ast.literal_eval(v.decode("utf-8")))
+        addresses[k] = {}
+        addresses[k].update(ast.literal_eval(v.decode("utf-8")))
         #print("Address %s date_counters %s " % (k, v))
-    #print(date_counters)
+    #print(addresses)
+
+
+def db_prune():
+    it = db.iteritems()
+    it.seek_to_first()
+    for i in it:
+        k = str(i[0], "utf-8")
+        if k is not addresses:
+            #print("Delete %s address from db " % (k))
+            db.delete(i[0])
 
 # first block of 2021 2660000
 
@@ -102,7 +109,7 @@ def get_counters(process_type, block_start, block_stop, order):
     j = 0
     for i in range(block_start, block_stop, order):
         j += 1
-        print("Getting block %d..." % i)
+        #print("Getting block %d..." % i)
         block_hash = conn.getblockhash(i)
         block = conn.getblock(block_hash, True)
         for tx_hash in block['tx']:
@@ -150,10 +157,10 @@ def get_counters(process_type, block_start, block_stop, order):
                                     if address not in date_counters or not date_counters[address]:
                                         date_counters[address] = {}
                                         addresses[address]['date_counters'] = {}
-                                        date_counters[address]['ymdH'] = {}
-                                        date_counters[address]['ymd'] = {}
-                                        date_counters[address]['ym'] = {}
-                                        date_counters[address]['y'] = {}
+                                        date_counters[address]['ymdH'] = OrderedDict()
+                                        date_counters[address]['ymd'] = OrderedDict()
+                                        date_counters[address]['ym'] = OrderedDict()
+                                        date_counters[address]['y'] = OrderedDict()
                                     if ymdH not in date_counters[address]['ymdH']:
                                         date_counters[address]['ymdH'][ymdH] = 0
                                     if ymd not in date_counters[address]['ymd']:
@@ -171,21 +178,19 @@ def get_counters(process_type, block_start, block_stop, order):
                                     addresses[address]['date_counters']['ymd'] = [{'date': key, 'count': value} for key, value in date_counters[address]['ymd'].items()]
                                     addresses[address]['date_counters']['ym'] = [{'date': key, 'count': value} for key, value in date_counters[address]['ym'].items()]
                                     addresses[address]['date_counters']['y'] = [{'date': key, 'count': value} for key, value in date_counters[address]['y'].items()]
-                                    db.put(bytes(address, 'utf-8'), bytes(str(date_counters[address]), 'utf-8'))
+                                    db.put(bytes(address, 'utf-8'), bytes(str(addresses[address]), 'utf-8'))
                             break
 
-db_to_date_counters()
-
-get_counters(PROCESS_BLOCK_COUNTERS, blockCount, blockCount-100, -1)
+get_counters(PROCESS_BLOCK_COUNTERS, blockCount, blockCount-1000, -1)
 
 if first_time:
-    #get_counters(PROCESS_DATE_COUNTERS, 2660000)
-    get_counters(PROCESS_DATE_COUNTERS, blockCount-100, blockCount, +1)
+    get_counters(PROCESS_DATE_COUNTERS, 2660000, blockCount, +1)
 else:
     with open(address_stake_run_file, 'r') as json_data:
         d = json.load(json_data)
         json_data.close()
-        get_counters(PROCESS_DATE_COUNTERS, d["block"], blockCount, +1)
+        db_to_date_counters()
+        get_counters(PROCESS_DATE_COUNTERS, d["block"]+1, blockCount, +1)
 
 try:
     address_stake_array = []
@@ -199,7 +204,7 @@ try:
     with open(address_stake_file, 'w+') as f:
         json.dump(address_stake_array, f)
 
-    print(json.dumps(address_stake_array))
+    #print(json.dumps(address_stake_array))
 
     address_stake_run["block"] = blockCount
 except:
