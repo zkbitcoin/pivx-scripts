@@ -77,9 +77,6 @@ httpConnection = httplib.HTTPConnection(rpc_host, rpc_port, timeout=20)
 conn = AuthServiceProxy(rpc_url, timeout=1000, connection=httpConnection)
 blockCount = conn.getblockcount()
 addresses = {}
-block_counters = {}
-date_counters = OrderedDict()
-
 
 def db_to_date_counters():
     it = db.iteritems()
@@ -104,6 +101,14 @@ def db_prune():
 
 # first block of 2021 2660000
 
+def update_counters(address, pattern, date):
+    found = False
+    for e in addresses[address]['date_counters'][pattern]:
+        if e['date'] == date:
+            found = True
+            e['count'] = e['count'] + 2
+    if not found:
+        addresses[address]['date_counters']['ymdH'].append({'date': date, 'count': 2})
 
 def get_counters(process_type, block_start, block_stop, order):
     j = 0
@@ -126,10 +131,10 @@ def get_counters(process_type, block_start, block_stop, order):
                                 tx_addresses = vout["scriptPubKey"]["addresses"]
                                 address = tx_addresses[0]
                                 if process_type == PROCESS_BLOCK_COUNTERS:
-                                    #print("Updating block %i for address %s..." % (i, address))
-                                    if address not in block_counters:
+                                    if address not in addresses:
                                         addresses[address] = {}
-                                        block_counters[address] = [0,0,0,0,0]
+                                    if 'block_counters' not in  addresses[address]:
+                                        addresses[address]['block_counters'] = [0,0,0,0,0]
                                     if j <= 50:
                                         k = 0
                                     elif j <= 250:
@@ -141,42 +146,26 @@ def get_counters(process_type, block_start, block_stop, order):
                                     else:
                                         k = 4
                                     for l in range(k, 5):
-                                        block_counters[address][l] = block_counters[address][l] + 2
+                                        addresses[address]['block_counters'][l] = addresses[address]['block_counters'][l] + 2
                                     #print("Updating Address %s block counters %s " % (address, block_counters[address]))
-                                    addresses[address]['block_counters'] = block_counters[address]
                                 else: # PROCESS_DATE_COUNTERS
-                                    #dt = datetime.strptime("2021-10-23 06", "%Y-%m-%d %H")
-                                    #print(dt.hour)
-                                    if address not in block_counters:
+                                    if address not in addresses:
                                         continue
                                     date = datetime.fromtimestamp(int(tx_raw["time"]))
                                     ymdH = date.strftime("%Y-%m-%d %H")
                                     ymd = date.strftime("%Y-%m-%d")
                                     ym = date.strftime("%Y-%m")
                                     y = date.strftime("%Y")
-                                    if address not in date_counters:
-                                        date_counters[address] = {}
+                                    if 'date_counters' not in  addresses[address]:
                                         addresses[address]['date_counters'] = {}
-                                        date_counters[address]['ymdH'] = OrderedDict()
-                                        date_counters[address]['ymd'] = OrderedDict()
-                                        date_counters[address]['ym'] = OrderedDict()
-                                        date_counters[address]['y'] = OrderedDict()
-                                    if ymdH not in date_counters[address]['ymdH']:
-                                        date_counters[address]['ymdH'][ymdH] = 0
-                                    if ymd not in date_counters[address]['ymd']:
-                                        date_counters[address]['ymd'][ymd] = 0
-                                    if ym not in date_counters[address]['ym']:
-                                        date_counters[address]['ym'][ym] = 0
-                                    if y not in date_counters[address]['y']:
-                                        date_counters[address]['y'][y] = 0
-                                    date_counters[address]['ymdH'][ymdH] = date_counters[address]['ymdH'][ymdH] + 2
-                                    date_counters[address]['ymd'][ymd] = date_counters[address]['ymd'][ymd] + 2
-                                    date_counters[address]['ym'][ym] = date_counters[address]['ym'][ym] + 2
-                                    date_counters[address]['y'][y] = date_counters[address]['y'][y] + 2
-                                    addresses[address]['date_counters']['ymdH'] = [{'date': key, 'count': value} for key, value in date_counters[address]['ymdH'].items()]
-                                    addresses[address]['date_counters']['ymd'] = [{'date': key, 'count': value} for key, value in date_counters[address]['ymd'].items()]
-                                    addresses[address]['date_counters']['ym'] = [{'date': key, 'count': value} for key, value in date_counters[address]['ym'].items()]
-                                    addresses[address]['date_counters']['y'] = [{'date': key, 'count': value} for key, value in date_counters[address]['y'].items()]
+                                        addresses[address]['date_counters']['ymdH'] = []
+                                        addresses[address]['date_counters']['ymd'] = []
+                                        addresses[address]['date_counters']['ym'] = []
+                                        addresses[address]['date_counters']['y'] = []
+                                    update_counters(address, 'ymdH', ymdH)
+                                    update_counters(address, 'ymd', ymd)
+                                    update_counters(address, 'ym', ym)
+                                    update_counters(address, 'y', y)
                                     #print("Updating Address %s date_counters %s " % (address, addresses[address]))
                                     db.put(bytes(address, 'utf-8'), bytes(str(addresses[address]), 'utf-8'))
                             break
