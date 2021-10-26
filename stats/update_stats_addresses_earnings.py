@@ -109,7 +109,7 @@ def get_counters(process_type, block_start, block_stop, order):
     j = 0
     for i in range(block_start, block_stop, order):
         j += 1
-        #print("Getting block %d..." % i)
+        print("Getting block %d..." % i)
         block_hash = conn.getblockhash(i)
         block = conn.getblock(block_hash, True)
         for tx_hash in block['tx']:
@@ -156,7 +156,6 @@ def get_counters(process_type, block_start, block_stop, order):
                                     y = date.strftime("%Y")
                                     if address not in date_counters:
                                         date_counters[address] = {}
-                                    if 'date_counters' not in date_counters[address]:
                                         addresses[address]['date_counters'] = {}
                                         date_counters[address]['ymdH'] = OrderedDict()
                                         date_counters[address]['ymd'] = OrderedDict()
@@ -170,15 +169,15 @@ def get_counters(process_type, block_start, block_stop, order):
                                         date_counters[address]['ym'][ym] = 0
                                     if y not in date_counters[address]['y']:
                                         date_counters[address]['y'][y] = 0
-                                    date_counters[address]['ymdH'].update({ymdH: date_counters[address]['ymdH'][ymdH]+2})
-                                    date_counters[address]['ymd'].update({ymd: date_counters[address]['ymd'][ymd]+2})
-                                    date_counters[address]['ym'].update({ym: date_counters[address]['ym'][ym]+2})
-                                    date_counters[address]['y'].update({y: date_counters[address]['y'][y]+2})
-                                    #print("Updating Address %s date_counters %s " % (address, date_counters[address]))
+                                    date_counters[address]['ymdH'][ymdH] = date_counters[address]['ymdH'][ymdH] + 2
+                                    date_counters[address]['ymd'][ymd] = date_counters[address]['ymd'][ymd] + 2
+                                    date_counters[address]['ym'][ym] = date_counters[address]['ym'][ym] + 2
+                                    date_counters[address]['y'][y] = date_counters[address]['y'][y] + 2
                                     addresses[address]['date_counters']['ymdH'] = [{'date': key, 'count': value} for key, value in date_counters[address]['ymdH'].items()]
                                     addresses[address]['date_counters']['ymd'] = [{'date': key, 'count': value} for key, value in date_counters[address]['ymd'].items()]
                                     addresses[address]['date_counters']['ym'] = [{'date': key, 'count': value} for key, value in date_counters[address]['ym'].items()]
                                     addresses[address]['date_counters']['y'] = [{'date': key, 'count': value} for key, value in date_counters[address]['y'].items()]
+                                    #print("Updating Address %s date_counters %s " % (address, addresses[address]))
                                     db.put(bytes(address, 'utf-8'), bytes(str(addresses[address]), 'utf-8'))
                             break
 
@@ -191,7 +190,7 @@ else:
         d = json.load(json_data)
         json_data.close()
         db_to_date_counters()
-        #get_counters(PROCESS_DATE_COUNTERS, d["block"]+1, blockCount, +1)
+        get_counters(PROCESS_DATE_COUNTERS, d["block"]+1, blockCount, +1)
 
 try:
     address_stake_array = []
