@@ -300,7 +300,7 @@ Result is json file of the sample format below
   }
 ]
 
-```json
+```
 
 ```json (balances)
   
