@@ -20,7 +20,7 @@ Note:
 Result is json file of the sample format below
 (block_counters array structure is index = 0 thru 4 staking counts for last 50 250 500 750 1000 blocks respectively 
 
-```json (earnings)
+```json (rewards)
 [
   {
     "address": "D6ixy2j2qyYMPAibobymDkiXMEYSyKX3Mb",
@@ -300,8 +300,9 @@ Result is json file of the sample format below
   }
 ]
 
+```json
 
-json (earnings)
+```json (balances)
   
 {
     "a": "D5B883rADzdGGCPtFTEk6xCnTQi1hPkhBt",
