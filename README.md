@@ -9,16 +9,18 @@ pivx-scripts
 
 4. pip3 install -r requirements.txt
 
-5. update default json and db paths in update_stats_addresses_earnings.py
+5. update default json and db paths in update_stats_addresses_earnings.py update_stats_addresses_balances.py
 
 6. python3 update_stats_addresses_earnings.py
+
+7. python3 update_stats_addresses_balances.py
 
 Note:
 
 Result is json file of the sample format below
 (block_counters array structure is index = 0 thru 4 staking counts for last 50 250 500 750 1000 blocks respectively 
 
-```json
+```json (earnings)
 [
   {
     "address": "D6ixy2j2qyYMPAibobymDkiXMEYSyKX3Mb",
@@ -297,4 +299,42 @@ Result is json file of the sample format below
     }
   }
 ]
+
+
+json (earnings)
+  
+{
+    "a": "D5B883rADzdGGCPtFTEk6xCnTQi1hPkhBt",
+    "dc": [
+      {
+        "d": 1562029200,
+        "r": 36400000000,
+        "s": 0,
+        "ss": 0
+      },
+      {
+        "d": 1563498000,
+        "r": 36600000000,
+        "s": 36400000000,
+        "ss": 36600000000
+      },
+      {
+        "d": 1563937200,
+        "r": 36800000000,
+        "s": 36600000000,
+        "ss": 36800000000
+      },
+      {
+        "d": 1565017200,
+        "r": 37000000000,
+        "s": 36800000000,
+        "ss": 37000000000
+      },
+      {
+        "d": 1565697600,
+        "r": 37200000000,
+        "s": 37000000000,
+        "ss": 37200000000
+      },
+}
 ```
