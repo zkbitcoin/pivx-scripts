@@ -11,10 +11,12 @@ import rocksdb
 import threading
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import argparse
 import json
 import os
-import ast
+
 
 THREADS_COUNT = 20
 skip_addresses = { 'STx39nArrm6fRBuo1QGm76Aax9YURGCiYi' : True, 'SMxvgbUZ1K5hEX1DVZq1KXpT7VArhY1iRZ': True }
@@ -48,6 +50,27 @@ parser.add_argument('-db', '--db-balances-location-path',
                     dest="db",
                     metavar="--db-balances-location-path>",
                     help="--db-balances-location-path")
+parser.add_argument('-a', '--api-url',
+                    required=False,
+                    type=str,
+                    default="http://127.0.0.1",
+                    dest="apiurl",
+                    metavar="<output-location-path>",
+                    help="output-location-path")
+parser.add_argument('-crt', '--crt',
+                    required=False,
+                    type=str,
+                    default="../../../cert/CA/localhost/localhost.crt",
+                    dest="crt",
+                    metavar="<crt>",
+                    help="crt")
+parser.add_argument('-key', '--key',
+                    required=False,
+                    type=str,
+                    default="../../../cert/CA/localhost/localhost.key",
+                    dest="key",
+                    metavar="<key>",
+                    help="key")
 
 args = parser.parse_args()
 
@@ -95,7 +118,8 @@ address_balances = {}
 
 class BlockbookClient:
     def __init__(self):
-        self.url = "http://127.0.0.1/api/v2/balancehistory"
+        self.url = args.apiurl
+        self.url = self.url + "/api/v2/balancehistory"
         self.s = requests.Session()
         self.retries = Retry(total=5, backoff_factor=1, status_forcelist=[ 502, 503, 504 ])
         self.s.mount('http://', HTTPAdapter(max_retries=self.retries))
@@ -107,7 +131,10 @@ class BlockbookClient:
         headers = {
             'Accept': "application/json",
         }
-        resp = self.s.get(url, headers=headers, data={}, verify=True)
+        if args.apiurl.startswith('https'):
+            resp = self.s.get(url, data={}, verify=False, cert=(args.crt, args.key))
+        else:
+            resp = self.s.get(url, data={}, verify=True)
         if resp.status_code == 200:
             data = resp.json()
             return data
@@ -132,9 +159,8 @@ def db_to_array():
 def update(i, d):
     address_balances_array = []
     b = json.loads(json.dumps(d))
-    balance = 0
     for e in b:
-        address_balances_array.append({'d': int(e["time"]), "r" : int(e["received"]), "s" : int(e["sent"]), "ss" : int(e["sentToSelf"])})
+        address_balances_array.append({'t': int(e["time"]), "r" : int(e["received"]), "s" : int(e["sent"]), "ss" : int(e["sentToSelf"])})
     address_balances[i] = address_balances_array
     dbb.put((address_balances_cf, bytes(i, 'utf-8')), bytes(str(address_balances_array), 'utf-8'))
 
@@ -146,7 +172,7 @@ def process(address_array):
             continue
         if i in address_balances:
             if len(address_balances[i]) > 0:
-                d = bb_conn.get_balance_history(i, param="from=" + str(address_balances[i][-1]['d'] + 1) + "&groupBy=86400")
+                d = bb_conn.get_balance_history(i, param="from=" + str(address_balances[i][-1]['t'] + 86400) + "&groupBy=86400")
                 if d is None:
                     continue
                 update(i, d)
@@ -209,6 +235,7 @@ def main():
     address_balances_array  = []
     for k, v in address_balances.items():
         address_balances_array.append({"a": k, "dc": v})
+
     with open(address_balances_file, 'w+') as f:
         json.dump(address_balances_array , f)
 

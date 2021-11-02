@@ -289,7 +289,7 @@ const json = "[\n" +
     "    }\n" +
     "  }\n" +
     "]"
-const earnings_data = JSON.parse(json);
+const rewards_data = JSON.parse(json);
 
 var xValue = []
 var yValue = []
@@ -303,10 +303,10 @@ function getAddressData(address) {
 var today = new Date();
 var yyyymm = today.getFullYear() + "-" + ("0" + (today.getMonth() + 1)).slice(-2)
 
-for(var i = 0; i < earnings_data[0].counters.date_counters.ymd.length; i++) {
-    var date = earnings_data[0].counters.date_counters.ymd[i].date;
+for(var i = 0; i < rewards_data[0].counters.date_counters.ymd.length; i++) {
+    var date = rewards_data[0].counters.date_counters.ymd[i].date;
     if (yyyymm == date.slice(0, -3)) {
-        var count = earnings_data[0].counters.date_counters.ymd[i].count;
+        var count = rewards_data[0].counters.date_counters.ymd[i].count;
         xValue.push(date)
         yValue.push(count)
     }
@@ -332,7 +332,7 @@ var trace = {
 var data = [trace];
 
 var layout = {
-    title: 'POS Earnings'
+    title: 'POS Rewards'
 };
 
 Plotly.newPlot('root', data, layout);
