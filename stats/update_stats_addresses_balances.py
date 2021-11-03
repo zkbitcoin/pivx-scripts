@@ -16,7 +16,11 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import argparse
 import json
 import os
-
+from bitcoinrpc.authproxy import AuthServiceProxy
+try:
+    import http.client as httplib
+except ImportError:
+    import httplib
 
 THREADS_COUNT = 20
 skip_addresses = { 'STx39nArrm6fRBuo1QGm76Aax9YURGCiYi' : True, 'SMxvgbUZ1K5hEX1DVZq1KXpT7VArhY1iRZ': True }
@@ -76,6 +80,17 @@ args = parser.parse_args()
 
 address_balances_run_file = os.path.join(args.rloc, "address_balances_run.json")
 address_balances_file = os.path.join(args.p, "address_balances.json")
+
+isTestnet = False
+rpc_user = "rpc"
+rpc_pass = "pivxrpc"
+rpc_host = "127.0.0.1"
+rpc_port = "18049" if isTestnet else "8049"
+rpc_url = "http://%s:%s@%s" % (rpc_user, rpc_pass, rpc_host)
+
+httpConnection = httplib.HTTPConnection(rpc_host, rpc_port, timeout=20)
+conn = AuthServiceProxy(rpc_url, timeout=1000, connection=httpConnection)
+blockCount = conn.getblockcount()
 
 first_time = False
 
@@ -172,7 +187,7 @@ def process(address_array):
             continue
         if i in address_balances:
             if len(address_balances[i]) > 0:
-                d = bb_conn.get_balance_history(i, param="from=" + str(address_balances[i][-1]['t'] + 86400) + "&groupBy=86400")
+                d = bb_conn.get_balance_history(i, param="from=" + str(address_balances[i][-1]['t']) + "&groupBy=86400")
                 if d is None:
                     continue
                 update(i, d)
@@ -206,12 +221,17 @@ def main():
         key = i[1].decode("utf-8")
         address_array.append(key)
         address_added[key] = True
-    it = dbr.iterkeys(address_rewards_mn_cf)
-    it.seek_to_first()
-    for i in it:
-        key = i[1].decode("utf-8")
-        if key not in address_added:
-            address_array.append(key)
+    #it = dbr.iterkeys(address_rewards_mn_cf)
+    #it.seek_to_first()
+    #for i in it:
+    #    key = i[1].decode("utf-8")
+    #    if key not in address_added:
+    #        address_array.append(key)
+
+    masternodes = conn.listmasternodes()
+    for mn in masternodes:
+        if mn["addr"] not in address_added:
+            address_array.append(mn["addr"])
 
     l = len(address_array)
     e = int(l / THREADS_COUNT)
@@ -244,6 +264,7 @@ def main():
         address_balances_run["run"] = True
         json.dump(address_balances_run, f)
 
+    httpConnection.close()
 
 if __name__ == "__main__":
     main()

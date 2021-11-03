@@ -59,7 +59,7 @@ parser.add_argument('-d', '--db-location-path',
                     dest="dbloc",
                     metavar="<output-location-path>",
                     help="output-location-path")
-
+MAX_BLOCK_DEPTH = 1000
 ADDRESSES_POS = 0
 ADDRESSES_MN = 1
 PROCESS_BLOCK_COUNTERS = 0
@@ -252,7 +252,7 @@ def get_counters(process_type, block_start, block_stop, order):
                             if (i := (i + 1)) > 1:
                                 break
 
-get_counters(PROCESS_BLOCK_COUNTERS, blockCount, blockCount-2000-1, -1)
+get_counters(PROCESS_BLOCK_COUNTERS, blockCount, blockCount-MAX_BLOCK_DEPTH-1, -1)
 
 if first_time:
     get_counters(PROCESS_DATE_COUNTERS, 2660000, blockCount+1, +1)
